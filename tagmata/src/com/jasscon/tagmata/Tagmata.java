@@ -310,6 +310,14 @@ public class Tagmata {
 	}
 	
 	private void searchCards(String terms) {
+		if (terms.trim().length() == 0) {
+			int result = JOptionPane.showConfirmDialog(frmTagmata,
+					"You have entered no search terms and which will show all the cards in you have indexed till now. \nThis can take a really long time if you have indexes thousands of cards. \nIf the application crashes in between, you might end up corrupting your index. \n\nContinue?", "No Search Terms Entered",
+					JOptionPane.OK_CANCEL_OPTION);
+			if (result == 2) {
+				return;
+			}
+		}
 		List<Card> cards = Indexer.getCards(terms);
 		showResults(cards);
 	}
