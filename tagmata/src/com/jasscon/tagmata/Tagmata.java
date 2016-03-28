@@ -35,6 +35,7 @@ import javax.swing.table.DefaultTableModel;
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
+import java.awt.event.KeyAdapter;
 
 public class Tagmata {
 
@@ -108,6 +109,14 @@ public class Tagmata {
 		JLabel lblNewLabel = new JLabel("Tags");
 
 		queryString = new JTextField();
+		queryString.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyChar() == '\n') {
+					searchCards(queryString.getText());
+				}
+			}
+		});
 		queryString.setColumns(10);
 
 		searchBtn = new JButton("Search");
