@@ -33,17 +33,20 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 
 public class Tagmata {
 
 	private JFrame frmTagmata;
 	private JTextField cardTags;
-	private JTextArea cardText = new JTextArea();
 	private JTable table;
 	private JTextField queryString;
 	private JButton searchBtn;
 	private JButton btnReset;
 	private Card activeCard;
+	private JScrollPane scrollPane_1;
+	private JTextPane cardText;
 
 	/**
 	 * Launch the application.
@@ -130,6 +133,8 @@ public class Tagmata {
 				activeCard = null;
 			}
 		});
+		
+		scrollPane_1 = new JScrollPane();
 		GroupLayout groupLayout = new GroupLayout(frmTagmata.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -137,33 +142,33 @@ public class Tagmata {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE))
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGap(10)
 							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(cardTags, GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE))
+									.addComponent(cardTags, GroupLayout.DEFAULT_SIZE, 647, Short.MAX_VALUE))
 								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(btnSave, GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
+									.addComponent(btnSave, GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE))))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(queryString, GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
+							.addComponent(queryString, GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(searchBtn, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(cardText, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)))
+							.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(cardText, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE)
+					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(cardTags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -180,6 +185,9 @@ public class Tagmata {
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
 					.addContainerGap())
 		);
+		
+		cardText = new JTextPane();
+		scrollPane_1.setViewportView(cardText);
 
 		table = new JTable();
 		
@@ -254,6 +262,8 @@ public class Tagmata {
 					DefaultTableModel dm = (DefaultTableModel) table.getModel();
 					dm.removeRow(table.getSelectedRow());
 					if (activeCard != null && activeCard.getCardId().equals(cardId)) {
+						cardText.setText("");
+						cardTags.setText("");
 						activeCard = null;
 					}
 				}
