@@ -1,18 +1,27 @@
 package com.jasscon.tagmata;
 
+import java.awt.AWTException;
 import java.awt.EventQueue;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
+import java.awt.Image;
+import java.awt.MenuItem;
 import java.awt.Point;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,8 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -33,9 +42,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import java.awt.event.KeyAdapter;
 
 public class Tagmata {
 
@@ -78,16 +84,17 @@ public class Tagmata {
 	 */
 	private void initialize() {
 		frmTagmata = new JFrame();
-		frmTagmata.setTitle("Tagmata");
+		frmTagmata.setTitle(" Tagmata");
 		frmTagmata.setBounds(100, 100, 563, 506);
-		frmTagmata.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmTagmata.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (activeCard != null) {
 					Indexer.deleteCard(activeCard.getCardId());
-					Indexer.addCard(activeCard.getCardId(), cardTags.getText(), cardText.getText());
+					Indexer.addCard(activeCard.getCardId(), cardTags.getText(),
+							cardText.getText());
 					searchCards(queryString.getText());
 					activeCard = null;
 				} else {
@@ -142,70 +149,162 @@ public class Tagmata {
 				activeCard = null;
 			}
 		});
-		
+
 		scrollPane_1 = new JScrollPane();
 		GroupLayout groupLayout = new GroupLayout(frmTagmata.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(10)
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(cardTags, GroupLayout.DEFAULT_SIZE, 647, Short.MAX_VALUE))
-								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(btnSave, GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE))))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(queryString, GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(searchBtn, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)))
-					.addContainerGap())
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cardTags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(queryString, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(searchBtn))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-					.addContainerGap())
-		);
-		
+		groupLayout
+				.setHorizontalGroup(groupLayout
+						.createParallelGroup(Alignment.TRAILING)
+						.addGroup(
+								groupLayout
+										.createSequentialGroup()
+										.addGroup(
+												groupLayout
+														.createParallelGroup(
+																Alignment.LEADING)
+														.addGroup(
+																groupLayout
+																		.createSequentialGroup()
+																		.addContainerGap()
+																		.addComponent(
+																				scrollPane,
+																				GroupLayout.DEFAULT_SIZE,
+																				687,
+																				Short.MAX_VALUE))
+														.addGroup(
+																groupLayout
+																		.createSequentialGroup()
+																		.addGap(10)
+																		.addGroup(
+																				groupLayout
+																						.createParallelGroup(
+																								Alignment.TRAILING)
+																						.addGroup(
+																								groupLayout
+																										.createSequentialGroup()
+																										.addComponent(
+																												lblNewLabel,
+																												GroupLayout.PREFERRED_SIZE,
+																												30,
+																												GroupLayout.PREFERRED_SIZE)
+																										.addPreferredGap(
+																												ComponentPlacement.UNRELATED)
+																										.addComponent(
+																												cardTags,
+																												GroupLayout.DEFAULT_SIZE,
+																												647,
+																												Short.MAX_VALUE))
+																						.addGroup(
+																								groupLayout
+																										.createSequentialGroup()
+																										.addComponent(
+																												btnSave,
+																												GroupLayout.DEFAULT_SIZE,
+																												577,
+																												Short.MAX_VALUE)
+																										.addPreferredGap(
+																												ComponentPlacement.RELATED)
+																										.addComponent(
+																												btnReset,
+																												GroupLayout.PREFERRED_SIZE,
+																												104,
+																												GroupLayout.PREFERRED_SIZE))))
+														.addGroup(
+																groupLayout
+																		.createSequentialGroup()
+																		.addContainerGap()
+																		.addComponent(
+																				queryString,
+																				GroupLayout.DEFAULT_SIZE,
+																				577,
+																				Short.MAX_VALUE)
+																		.addPreferredGap(
+																				ComponentPlacement.RELATED)
+																		.addComponent(
+																				searchBtn,
+																				GroupLayout.PREFERRED_SIZE,
+																				104,
+																				GroupLayout.PREFERRED_SIZE))
+														.addGroup(
+																groupLayout
+																		.createSequentialGroup()
+																		.addContainerGap()
+																		.addComponent(
+																				scrollPane_1,
+																				GroupLayout.DEFAULT_SIZE,
+																				535,
+																				Short.MAX_VALUE)))
+										.addContainerGap()));
+		groupLayout
+				.setVerticalGroup(groupLayout
+						.createParallelGroup(Alignment.LEADING)
+						.addGroup(
+								groupLayout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addComponent(scrollPane_1,
+												GroupLayout.PREFERRED_SIZE,
+												179, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(
+												ComponentPlacement.UNRELATED)
+										.addGroup(
+												groupLayout
+														.createParallelGroup(
+																Alignment.BASELINE)
+														.addComponent(
+																cardTags,
+																GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																lblNewLabel))
+										.addPreferredGap(
+												ComponentPlacement.RELATED)
+										.addGroup(
+												groupLayout
+														.createParallelGroup(
+																Alignment.LEADING,
+																false)
+														.addComponent(
+																btnReset,
+																GroupLayout.PREFERRED_SIZE,
+																51,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																btnSave,
+																GroupLayout.PREFERRED_SIZE,
+																51,
+																GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(
+												ComponentPlacement.RELATED)
+										.addGroup(
+												groupLayout
+														.createParallelGroup(
+																Alignment.BASELINE)
+														.addComponent(
+																queryString,
+																GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(searchBtn))
+										.addPreferredGap(
+												ComponentPlacement.RELATED)
+										.addComponent(scrollPane,
+												GroupLayout.DEFAULT_SIZE, 155,
+												Short.MAX_VALUE)
+										.addContainerGap()));
+
 		cardText = new JTextPane();
 		scrollPane_1.setViewportView(cardText);
 
 		table = new JTable();
-		
+
 		table.addMouseListener(new MouseAdapter() {
-		    public void mousePressed(MouseEvent me) {
-		        JTable table =(JTable) me.getSource();
-		        Point p = me.getPoint();
-		        int row = table.rowAtPoint(p);
-		        if (me.getClickCount() == 2) {
+			public void mousePressed(MouseEvent me) {
+				JTable table = (JTable) me.getSource();
+				Point p = me.getPoint();
+				int row = table.rowAtPoint(p);
+				if (me.getClickCount() == 2) {
 					String cardId = table.getModel()
 							.getValueAt(table.getSelectedRow(), 0).toString();
 					String tags = table.getModel()
@@ -218,12 +317,47 @@ public class Tagmata {
 					activeCard.setCardId(cardId);
 					activeCard.setTags(tags);
 					activeCard.setText(text);
-		        }
-		    }
+				}
+			}
 		});
-		
+
 		scrollPane.setViewportView(table);
 		frmTagmata.getContentPane().setLayout(groupLayout);
+
+		SystemTray tray = SystemTray.getSystemTray();
+		Image image = null;
+		try {
+			image = ImageIO.read(new File("images/tagmata.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		TrayIcon trayIcon = new TrayIcon(image, "Tagmata");
+		trayIcon.setImageAutoSize(true);
+		trayIcon.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				frmTagmata.setVisible(true);
+				frmTagmata.setState(java.awt.Frame.NORMAL);
+			}
+
+		});
+		try {
+			tray.add(trayIcon);
+		} catch (AWTException e) {
+			System.err.println(e);
+		}
+		final PopupMenu popup = new PopupMenu();
+		MenuItem exitItem = new MenuItem("     Exit     ");
+		exitItem.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		popup.add(exitItem);
+		trayIcon.setPopupMenu(popup);
+		ImageIcon img = new ImageIcon("images/tagmata.png");
+		frmTagmata.setIconImage(img.getImage());
 	}
 
 	private void showResults(List<Card> cards) {
@@ -270,7 +404,8 @@ public class Tagmata {
 					Indexer.deleteCard(cardId);
 					DefaultTableModel dm = (DefaultTableModel) table.getModel();
 					dm.removeRow(table.getSelectedRow());
-					if (activeCard != null && activeCard.getCardId().equals(cardId)) {
+					if (activeCard != null
+							&& activeCard.getCardId().equals(cardId)) {
 						cardText.setText("");
 						cardTags.setText("");
 						activeCard = null;
@@ -308,12 +443,15 @@ public class Tagmata {
 		table.setComponentPopupMenu(popupMenu);
 		table.doLayout();
 	}
-	
+
 	private void searchCards(String terms) {
 		if (terms.trim().length() == 0) {
-			int result = JOptionPane.showConfirmDialog(frmTagmata,
-					"You have entered no search terms and which will show all the cards in you have indexed till now. \nThis can take a really long time if you have indexes thousands of cards. \nIf the application crashes in between, you might end up corrupting your index. \n\nContinue?", "No Search Terms Entered",
-					JOptionPane.OK_CANCEL_OPTION);
+			int result = JOptionPane
+					.showConfirmDialog(
+							frmTagmata,
+							"You have entered no search terms and which will show all the cards in you have indexed till now. \nThis can take a really long time if you have indexes thousands of cards. \nIf the application crashes in between, you might end up corrupting your index. \n\nContinue?",
+							"No Search Terms Entered",
+							JOptionPane.OK_CANCEL_OPTION);
 			if (result == 2) {
 				return;
 			}
