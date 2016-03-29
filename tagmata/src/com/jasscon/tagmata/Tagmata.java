@@ -16,6 +16,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.BindException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -83,6 +86,15 @@ public class Tagmata {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		try {
+			// Bind to localhost adapter with a zero connection queue
+			ServerSocket socket = new ServerSocket(9999, 0,
+					InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
+		} catch (BindException e) {
+			System.exit(0);
+		} catch (IOException e) {
+			System.exit(0);
+		}
 		frmTagmata = new JFrame();
 		frmTagmata.setTitle(" Tagmata");
 		frmTagmata.setBounds(100, 100, 563, 506);
@@ -327,7 +339,7 @@ public class Tagmata {
 		SystemTray tray = SystemTray.getSystemTray();
 		Image image = null;
 		try {
-			image = ImageIO.read(new File("images/tagmata.png"));
+			image = ImageIO.read(Tagmata.class.getResource("tagmata.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -356,7 +368,7 @@ public class Tagmata {
 		});
 		popup.add(exitItem);
 		trayIcon.setPopupMenu(popup);
-		ImageIcon img = new ImageIcon("images/tagmata.png");
+		ImageIcon img = new ImageIcon(Tagmata.class.getResource("tagmata.png"));
 		frmTagmata.setIconImage(img.getImage());
 	}
 
