@@ -1,16 +1,26 @@
 package com.jasscon.tagmata;
 
-public class Card implements Comparable {
-	private String cardId;
+public class Card implements Comparable<Card> {
+	private Long cardId;
+	private Long bookmarkId;
 	private String tags;
 	private String text;
+	private int pos;
 
-	public String getCardId() {
+	public Long getCardId() {
 		return cardId;
 	}
 
-	public void setCardId(String cardId) {
+	public void setCardId(Long cardId) {
 		this.cardId = cardId;
+	}
+
+	public Long getBookmarkId() {
+		return bookmarkId;
+	}
+
+	public void setBookmarkId(Long bookmarkId) {
+		this.bookmarkId = bookmarkId;
 	}
 
 	public String getTags() {
@@ -29,7 +39,19 @@ public class Card implements Comparable {
 		this.text = text;
 	}
 
-	public int compareTo(Object o) {
-		return this.cardId.compareTo(((Card) o).getCardId());
+	public int getPos() {
+		return pos;
+	}
+
+	public void setPos(int pos) {
+		this.pos = pos;
+	}
+
+	public int compareTo(Card o) {
+		return this.cardId.compareTo(o.getCardId());
+	}
+	
+	public String snapshot() {
+		return "Tags: " + StringUtil.substring(tags, 100) + "\n Text: " + StringUtil.substring(text, 100);
 	}
 }
