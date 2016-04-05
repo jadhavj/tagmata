@@ -176,8 +176,7 @@ public class Tagmata {
 		JScrollPane scrollPane = new JScrollPane();
 
 		table = new JTable();
-		table.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null,
-				null));
+		table.setBorder(null);
 
 		table.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
