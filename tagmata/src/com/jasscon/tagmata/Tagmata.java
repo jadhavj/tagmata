@@ -1,12 +1,16 @@
 package com.jasscon.tagmata;
 
 import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -40,15 +46,19 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
 
 public class Tagmata {
 
@@ -59,7 +69,6 @@ public class Tagmata {
 	private JButton searchBtn;
 	private JButton btnReset;
 	private Card activeCard;
-	private JTextPane cardText;
 	private JSplitPane windowSplit;
 	private JButton delBmBtn;
 	private JButton mvBmUp;
@@ -67,6 +76,11 @@ public class Tagmata {
 
 	private JList bookmarkList;
 	private List<Card> bookmarks = new ArrayList<Card>();
+	private JTextPane cardText;
+	private JMenuBar menuBar;
+	private JMenu mnTagmata;
+	private JMenuItem mntmAbout;
+	private JMenuItem mntmExit;
 
 	/**
 	 * Launch the application.
@@ -110,8 +124,12 @@ public class Tagmata {
 		frmTagmata.setBounds(100, 100, 826, 562);
 		frmTagmata.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = (int) ((dimension.getWidth() - frmTagmata.getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - frmTagmata.getHeight()) / 2);
+		frmTagmata.setLocation(x, y);
+
 		windowSplit = new JSplitPane();
-		windowSplit.setOneTouchExpandable(true);
 		windowSplit.setDividerLocation(250);
 		GroupLayout groupLayout = new GroupLayout(frmTagmata.getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(
@@ -158,6 +176,8 @@ public class Tagmata {
 		JScrollPane scrollPane = new JScrollPane();
 
 		table = new JTable();
+		table.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null,
+				null));
 
 		table.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
@@ -244,8 +264,6 @@ public class Tagmata {
 		JPanel panel_1 = new JPanel();
 		mainSplit.setLeftComponent(panel_1);
 
-		cardText = new JTextPane();
-
 		JLabel lblNewLabel = new JLabel("Tags");
 
 		cardTags = new JTextField();
@@ -255,8 +273,15 @@ public class Tagmata {
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int sel = bookmarkList.getSelectedIndex();
+				if (cardTags.getText().trim().length() == 0
+						|| cardText.getText().trim().length() == 0) {
+					return;
+				}
 				if (activeCard != null) {
-					Indexer.deleteCard(activeCard.getCardId() + "", activeCard.getBookmarkId() != null ? activeCard.getBookmarkId() + "" : null);
+					Indexer.deleteCard(
+							activeCard.getCardId() + "",
+							activeCard.getBookmarkId() != null ? activeCard
+									.getBookmarkId() + "" : null);
 					Indexer.addCard(activeCard.getCardId() + "",
 							cardTags.getText(), cardText.getText());
 					activeCard = null;
@@ -293,6 +318,8 @@ public class Tagmata {
 				activeCard = null;
 			}
 		});
+
+		JScrollPane scrollPane_1 = new JScrollPane();
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1
 				.setHorizontalGroup(gl_panel_1
@@ -306,11 +333,12 @@ public class Tagmata {
 														.createParallelGroup(
 																Alignment.LEADING)
 														.addComponent(
-																cardText,
+																scrollPane_1,
 																GroupLayout.DEFAULT_SIZE,
-																513,
+																520,
 																Short.MAX_VALUE)
 														.addGroup(
+																Alignment.TRAILING,
 																gl_panel_1
 																		.createSequentialGroup()
 																		.addComponent(
@@ -323,7 +351,7 @@ public class Tagmata {
 																		.addComponent(
 																				cardTags,
 																				GroupLayout.DEFAULT_SIZE,
-																				479,
+																				486,
 																				Short.MAX_VALUE))
 														.addGroup(
 																Alignment.TRAILING,
@@ -332,7 +360,7 @@ public class Tagmata {
 																		.addComponent(
 																				btnSave,
 																				GroupLayout.DEFAULT_SIZE,
-																				403,
+																				410,
 																				Short.MAX_VALUE)
 																		.addPreferredGap(
 																				ComponentPlacement.RELATED)
@@ -344,14 +372,13 @@ public class Tagmata {
 										.addContainerGap()));
 		gl_panel_1
 				.setVerticalGroup(gl_panel_1
-						.createParallelGroup(Alignment.LEADING)
+						.createParallelGroup(Alignment.TRAILING)
 						.addGroup(
-								Alignment.TRAILING,
 								gl_panel_1
 										.createSequentialGroup()
 										.addContainerGap()
-										.addComponent(cardText,
-												GroupLayout.DEFAULT_SIZE, 137,
+										.addComponent(scrollPane_1,
+												GroupLayout.DEFAULT_SIZE, 191,
 												Short.MAX_VALUE)
 										.addPreferredGap(
 												ComponentPlacement.RELATED)
@@ -383,9 +410,13 @@ public class Tagmata {
 																51,
 																GroupLayout.PREFERRED_SIZE))
 										.addContainerGap()));
+
+		cardText = new JTextPane();
+		scrollPane_1.setViewportView(cardText);
 		panel_1.setLayout(gl_panel_1);
 
 		JPanel panel = new JPanel();
+		panel.setBorder(null);
 		windowSplit.setLeftComponent(panel);
 
 		delBmBtn = new JButton("Delete");
@@ -441,6 +472,11 @@ public class Tagmata {
 		});
 
 		bookmarkList = new JList(new DefaultListModel());
+		bookmarkList.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null,
+				null, null));
+
+		bookmarkList.setCellRenderer(getRenderer());
+
 		bookmarkList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -457,39 +493,69 @@ public class Tagmata {
 				}
 			}
 		});
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Favorites");
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addComponent(bookmarkList, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-						.addComponent(lblNewLabel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(delBmBtn, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(mvBmUp, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(mvBmDown, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
-		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblNewLabel_1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(delBmBtn)
-						.addComponent(mvBmDown)
-						.addComponent(mvBmUp))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(bookmarkList, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
-					.addContainerGap())
-		);
+		gl_panel.setHorizontalGroup(gl_panel
+				.createParallelGroup(Alignment.TRAILING)
+				.addGroup(
+						gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(
+										gl_panel.createParallelGroup(
+												Alignment.TRAILING)
+												.addComponent(
+														bookmarkList,
+														Alignment.LEADING,
+														GroupLayout.DEFAULT_SIZE,
+														229, Short.MAX_VALUE)
+												.addComponent(
+														lblNewLabel_1,
+														Alignment.LEADING,
+														GroupLayout.PREFERRED_SIZE,
+														229,
+														GroupLayout.PREFERRED_SIZE)
+												.addGroup(
+														Alignment.LEADING,
+														gl_panel.createSequentialGroup()
+																.addComponent(
+																		delBmBtn,
+																		GroupLayout.PREFERRED_SIZE,
+																		77,
+																		GroupLayout.PREFERRED_SIZE)
+																.addPreferredGap(
+																		ComponentPlacement.RELATED)
+																.addComponent(
+																		mvBmUp,
+																		GroupLayout.PREFERRED_SIZE,
+																		71,
+																		GroupLayout.PREFERRED_SIZE)
+																.addPreferredGap(
+																		ComponentPlacement.RELATED)
+																.addComponent(
+																		mvBmDown,
+																		GroupLayout.PREFERRED_SIZE,
+																		69,
+																		GroupLayout.PREFERRED_SIZE)))
+								.addContainerGap()));
+		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(
+				Alignment.LEADING)
+				.addGroup(
+						gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(lblNewLabel_1)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(
+										gl_panel.createParallelGroup(
+												Alignment.BASELINE)
+												.addComponent(delBmBtn)
+												.addComponent(mvBmDown)
+												.addComponent(mvBmUp))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(bookmarkList,
+										GroupLayout.DEFAULT_SIZE, 440,
+										Short.MAX_VALUE).addContainerGap()));
 		panel.setLayout(gl_panel);
 		frmTagmata.getContentPane().setLayout(groupLayout);
 
@@ -527,7 +593,47 @@ public class Tagmata {
 		trayIcon.setPopupMenu(popup);
 		ImageIcon img = new ImageIcon(Tagmata.class.getResource("tagmata.png"));
 		frmTagmata.setIconImage(img.getImage());
+		
+		menuBar = new JMenuBar();
+		frmTagmata.setJMenuBar(menuBar);
+		
+		mnTagmata = new JMenu("Options");
+		menuBar.add(mnTagmata);
+		
+		mntmAbout = new JMenuItem("About");
+		mntmAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				About about = new About(frmTagmata);
+				about.setVisible(true);
+				
+			}
+		});
+		mnTagmata.add(mntmAbout);
+		
+		mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		mnTagmata.add(mntmExit);
 		refreshBookmarks();
+	}
+
+	private ListCellRenderer getRenderer() {
+		return new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList<?> list,
+					Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				JLabel listCellRendererComponent = (JLabel) super
+						.getListCellRendererComponent(list, value, index,
+								isSelected, cellHasFocus);
+				listCellRendererComponent.setBorder(BorderFactory
+						.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+				return listCellRendererComponent;
+			}
+		};
 	}
 
 	private void showResults(List<Card> cards) {
@@ -636,7 +742,7 @@ public class Tagmata {
 			int result = JOptionPane
 					.showConfirmDialog(
 							frmTagmata,
-							"You have entered no search terms and which will show all the cards in you have indexed till now. \nThis can take a really long time if you have indexes thousands of cards. \nIf the application crashes in between, you might end up corrupting your index. \n\nContinue?",
+							"You have entered no search terms and this will show all the cards you have indexed till now.\nThis can take a really long time if you have indexed thousands of cards. \nIf the application crashes in between, you might end up corrupting your index. \n\nContinue?",
 							"No Search Terms Entered",
 							JOptionPane.OK_CANCEL_OPTION);
 			if (result == 2) {

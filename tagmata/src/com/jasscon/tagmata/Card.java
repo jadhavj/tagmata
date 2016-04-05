@@ -52,6 +52,6 @@ public class Card implements Comparable<Card> {
 	}
 	
 	public String snapshot() {
-		return "Tags: " + StringUtil.substring(tags, 100) + "\n Text: " + StringUtil.substring(text, 100);
+		return "<html>" + StringUtil.substring(text, 100) + "<br/><b>Tags:</b> " + StringUtil.substring(tags, 100) + "";
 	}
 }
