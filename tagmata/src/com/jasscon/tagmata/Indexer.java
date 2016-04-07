@@ -33,6 +33,18 @@ public class Indexer {
 		addCard(null, tags, text);
 	}
 
+	public static void init() {
+		try {
+			index = FSDirectory.open(Paths.get("tagmata-index"));
+			StandardAnalyzer analyzer = new StandardAnalyzer();
+			IndexWriterConfig config = new IndexWriterConfig(analyzer);
+			IndexWriter writer = new IndexWriter(index, config);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void addCard(String cardId, String tags, String text) {
 		try {
 			index = FSDirectory.open(Paths.get("tagmata-index"));
@@ -40,7 +52,8 @@ public class Indexer {
 			IndexWriterConfig config = new IndexWriterConfig(analyzer);
 			IndexWriter writer = new IndexWriter(index, config);
 			Document doc = new Document();
-			doc.add(new TextField("cardId", cardId == null ? "" + System.currentTimeMillis() : cardId, Field.Store.YES));
+			doc.add(new TextField("cardId", cardId == null ? ""
+					+ System.currentTimeMillis() : cardId, Field.Store.YES));
 			doc.add(new TextField("tags", tags, Field.Store.YES));
 			doc.add(new TextField("text", text, Field.Store.YES));
 			doc.add(new TextField("showAllFields", "showAllFields",
@@ -161,7 +174,8 @@ public class Indexer {
 			IndexWriterConfig config = new IndexWriterConfig(analyzer);
 			IndexWriter writer = new IndexWriter(index, config);
 			Document doc = new Document();
-			doc.add(new TextField("bookmarkId", System.currentTimeMillis() + "", Field.Store.YES));
+			doc.add(new TextField("bookmarkId",
+					System.currentTimeMillis() + "", Field.Store.YES));
 			doc.add(new TextField("cardId", cardId, Field.Store.YES));
 			doc.add(new TextField("pos", "" + pos, Field.Store.YES));
 			doc.add(new TextField("showAllBookmarks", "showAllBookmarks",
@@ -230,7 +244,7 @@ public class Indexer {
 		}
 		return null;
 	}
-	
+
 	public static void updateBookmarks(List<Card> bookmarks) {
 		for (Card bm : bookmarks) {
 			deleteBookmark(bm.getBookmarkId() + "");

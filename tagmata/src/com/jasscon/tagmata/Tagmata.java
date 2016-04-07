@@ -86,6 +86,7 @@ public class Tagmata {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		Indexer.init();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
