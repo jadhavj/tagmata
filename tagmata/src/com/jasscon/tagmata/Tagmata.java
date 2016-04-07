@@ -676,7 +676,6 @@ public class Tagmata {
 				if (result == 0) {
 					String cardId = table.getModel()
 							.getValueAt(table.getSelectedRow(), 0).toString();
-					System.out.println(cardId);
 					Indexer.deleteCard(cardId, null);
 					DefaultTableModel dm = (DefaultTableModel) table.getModel();
 					dm.removeRow(table.getSelectedRow());
